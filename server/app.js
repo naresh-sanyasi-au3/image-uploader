@@ -54,7 +54,13 @@ app.post('/uploads', uploadImage.array('image', 25), function (req, res, next) {
         .catch(err => res.status(400).json('error: ' + err));
         console.log("image uploaded: " + newImage)
 });
-
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static('build'));
+    const path = require('path');
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    });
+};
 
 
 
