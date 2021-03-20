@@ -7,12 +7,8 @@ require('dotenv').config();
 
 const port = process.env.PORT || 5000
 
-app.use(cors());
-app.use(express.static('client/build'));
-const path = require('path');
-app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client','build', 'index.html'));
-});
+// app.use(cors());
+
 
 mongoose
     .connect(process.env.DATABASE, {
@@ -48,6 +44,13 @@ const storage = multer.diskStorage({
 
 const uploadImage = multer({ storage: storage });
 
+
+app.get('/uploads', (req, res)=>{
+    Image.find()
+    .then(image => res.json(image))
+    .catch(err => res.status(400).json('error: ' + err));
+});
+
 app.post('/uploads', uploadImage.array('image', 25), function (req, res, next) {
     console.log(req.files)
     const filename = req.files;
@@ -60,6 +63,11 @@ app.post('/uploads', uploadImage.array('image', 25), function (req, res, next) {
         console.log("image uploaded: " + newImage)
 });
 
+app.use(express.static('client/build'));
+const path = require('path');
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client','build', 'index.html'));
+});
 
 
 
